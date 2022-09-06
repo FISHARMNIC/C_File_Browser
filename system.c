@@ -13,9 +13,9 @@ extern int commandToBuffer(char* buffer[], char * command)
     FILE *fp;
 
     if ((fp = popen(command, "r")) == NULL) {
-        printf("Error opening pipe!\n");
+        g_print("Unable to open pipe\n");
         return -1;
-    }
+    } 
 
     int buffer_at = 0;
 
@@ -27,7 +27,8 @@ extern int commandToBuffer(char* buffer[], char * command)
     }
 
     if (pclose(fp)) {
-        printf("Command not found or exited with error status\n");
+        g_print("Command not found or exited with error status\n");
+        exit(1);
         return -1;
     }
 
