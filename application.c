@@ -9,6 +9,7 @@ GtkWidget *addressBar;
 GtkWidget *Scrollable;
 GtkEntryBuffer *AddrBuffer;
 
+
 #define MAX_FILES 1000
 #define MAX_DIR_LEN 300
 
@@ -101,7 +102,7 @@ static void activate(GtkApplication *app, gpointer user_data)
     gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
 
     // vertical stack for top being the search bar + enter button
-    VerticalStack = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    VerticalStack = gtk_box_new(GTK_ORIENTATION_VERTICAL, 3);
     ParentVStack = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 
     Scrollable = gtk_scrolled_window_new();
@@ -111,6 +112,7 @@ static void activate(GtkApplication *app, gpointer user_data)
     // search bar and enter button
     AddrBuffer = gtk_entry_buffer_new(Directory, -1);
     addressBar = gtk_entry_new_with_buffer(AddrBuffer);
+    gtk_entry_set_placeholder_text (GTK_ENTRY(addressBar), "Path");
     gtk_widget_set_size_request(addressBar, 500, 10);
 
     GtkWidget *addressButton = gtk_button_new_with_label("Enter");
@@ -186,18 +188,27 @@ void renderElements()
         {
             GtkWidget *button = gtk_button_new();
             GtkWidget *txt = gtk_label_new(NULL);
+            GtkWidget *buttonPrefix = gtk_label_new(NULL);
+
             gtk_label_set_markup(GTK_LABEL(txt), g_markup_printf_escaped("<span size=\"xx-large\">\%s</span>", lsBuffer[i]));
-            gtk_button_set_child(GTK_BUTTON(button), txt);
+
+            GtkWidget *ButtonHStack = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 50);
+
+            gtk_button_set_child(GTK_BUTTON(button), ButtonHStack);
+            gtk_box_append(GTK_BOX(ButtonHStack), buttonPrefix);
+            gtk_box_append(GTK_BOX(ButtonHStack), txt);
 
             lsButtons[i] = button;
             lsID[i] = i;
             // if last char is a '/' meaning its a folder
             if (lsBuffer[i][strlen(lsBuffer[i]) - 1] == '/')
             {
+                gtk_label_set_markup(GTK_LABEL(buttonPrefix), g_markup_printf_escaped("<span size=\"xx-large\" fgcolor=\"blue\">%s</span>", "•"));
                 g_signal_connect(button, "clicked", G_CALLBACK(folder_clicked), &lsID[i]);
             }
             else
             {
+                gtk_label_set_markup(GTK_LABEL(buttonPrefix), g_markup_printf_escaped("<span size=\"xx-large\" fgcolor=\"white\">%s</span>", "•"));
                 g_signal_connect(button, "clicked", G_CALLBACK(file_clicked), &lsID[i]);
             }
             gtk_box_append(GTK_BOX(VerticalStack), button);
